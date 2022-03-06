@@ -16,4 +16,4 @@ To generate the patterns, hardware -and software timers are used. The basic puls
 Compiling with the Arduino IDE is straight forward. Just put the .ino file and the .h file in a subdirectory of your scratchbook foldere and name it like the name of the .ino file.
 To flash it make sure that the fueses are set correctly. I use:
 
-`avrdude -C  /usr/local/arduino-1.8.13/hardware/arduino/avr/bootloaders/gemma/avrdude.conf -c usbtiny -b 115200 -p m16 -e -U hfuse:w:0xDF:m -U lfuse:w:0xFF:m -U flash:w:DFD312V094.ino.hex
+`avrdude -C  /usr/local/arduino-1.8.13/hardware/arduino/avr/bootloaders/gemma/avrdude.conf -c usbtiny -b 115200 -p m16 -e -U hfuse:w:0xDF:m -U lfuse:w:0xFF:m -U flash:w:DFD312V094.ino.hex`
