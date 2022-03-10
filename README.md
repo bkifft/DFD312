@@ -17,3 +17,22 @@ Compiling with the Arduino IDE is straight forward. Just put the .ino file and t
 To flash it make sure that the fueses are set correctly. I use:
 
 `avrdude -C  /usr/local/arduino-1.8.13/hardware/arduino/avr/bootloaders/gemma/avrdude.conf -c usbtiny -b 115200 -p m16 -e -U hfuse:w:0xDF:m -U lfuse:w:0xFF:m -U flash:w:DFD312V094.ino.hex`
+
+## Bluetooth HC-05 configuring
+The [MK-312BT](https://github.com/CrashOverride85/mk312-bt/tree/master/bluetooth_conf) nicely describes the initial configuring of the HC-05 module. However, running the provided ATMega16 binary did bring me uncertainties. The program did run till the password config step and stopped there. As I was not sure about the state I configured my HC-05 manually with a USB/serial adaptor. See [this picture]() for the wiring. Using a standard terminal adaptor the HC-05 can be put into command mode (press the button during power up) and the known AT commands can be executed:
+
+`picocom /dev/ttyUSB0 --baud 38400 --omap crcrlf --echo` 
+`AT
+OK
+AT+VERSION?
+VERSION:3.0-20170601
+OK
+AT+NAME=DFD-312BT
+OK`
+
+Regarding the polarity of pin6 the description in MK-312BT seems wrong. I use
+`AT+POLAR=0,0
+OK`
+
+which turns the 'radio LED' on once the HC-05 module is pluged in.
+
