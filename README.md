@@ -39,4 +39,5 @@ OK
 ```
 
 which turns the 'radio LED' on once the HC-05 module is pluged in.
+Also to be noted is, that the HC-05 runs only bluethooth v2 which is not supported by iOS, e.g. bluetooth with the MK-312BT and the firmware provided in this repository will not work with an iPhone.
 
