@@ -40,4 +40,5 @@ OK
 
 which turns the 'radio LED' on once the HC-05 module is pluged in.
 Also to be noted is, that the HC-05 runs only bluethooth v2 which is not supported by iOS, e.g. bluetooth with the MK-312BT and the firmware provided in this repository will not work with an iPhone.
+After configuring the HC-05 several times by hand I finally understood how to programm it and how to use the UART interface of the ATMega16. The result is a BTConfig option in the 'More Options' menu.
 
