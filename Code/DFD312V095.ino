@@ -3,6 +3,7 @@
 #include <LTC1661.h>        // https://github.com/walle86/
 
 #include "Button.h"
+#include "usart.c"
 
 #define VERSION   "0.95"
 
@@ -115,8 +116,9 @@ const char r1[] PROGMEM = "Random3 Mode ?  ";
 const char r2[] PROGMEM = "Random4 Mode ?  ";
 const char r3[] PROGMEM = "Debug Mode ?    ";
 const char r4[] PROGMEM = "Link Slave Unit?";
-const char* const MoreOptionsStrings[4] PROGMEM = {r1, r2, r3, r4};
-#define NrMoreOptions 4 // nr. of Options for Options Menu
+const char r5[] PROGMEM = "Config Bluetooth";
+const char* const MoreOptionsStrings[5] PROGMEM = {r1, r2, r3, r4, r5};
+#define NrMoreOptions 5 // nr. of Options for Options Menu
 byte SplitIX;
 const char s1[] PROGMEM = "Split:A         ";
 const char s2[] PROGMEM = "Split:B         ";
@@ -135,9 +137,20 @@ const char a8[] PROGMEM = "     PaceAdjust?";
 const char* const AdvancedStrings[8] PROGMEM = {a1, a2, a3, a4, a5, a6, a7, a8};
 #define NrAdvanced 8 // nr. of Options for Options Menu
 
+const char h1[] PROGMEM = "AT\r\n\0";
+const char h2[] PROGMEM = "AT+VERSION?\r\n\0";
+const char h3[] PROGMEM = "AT+NAME=DFD312V095\r\n\0";
+const char h4[] PROGMEM = "AT+PSWD=1234\r\n\0";
+const char h5[] PROGMEM = "AT+POLAR=0,0\r\n\0";
+const char h6[] PROGMEM = "AT+IPSCAN=1024,1,1024,1\r\n\0";
+const char h7[] PROGMEM = "AT+RESET\r\n\0";
+const char h8[] PROGMEM = "                         \0";
 
-char LineBuffer[20]; // ram buffer for copying progmem to LCD
-char LineBuffer1[20];
+const char* const ATStrings[8] PROGMEM = {h1, h2, h3, h4, h5, h6, h7, h8};
+#define NrAT 7 // nr. of Options for Options Menu
+
+char  LineBuffer[30]; // ram buffer for copying progmem to LCD
+char LineBuffer1[30];
 
 // some menues operate the same way. We keep pointers to these menues in an array for easy reference
 // function prototypes, leave these be :) 
@@ -746,14 +759,43 @@ void SetMoreOptions(byte ButtonCode) {
   delay(1000);
 }
 
+
+
+void BTInit(byte ButtonCode) {
+  // see https://wiki.iteadstudio.com/Serial_Port_Bluetooth_Module_(Master/Slave)_:_HC-05#Download for the description
+  // of the AT commands that the HC-05 understands
+  byte i;
+   DisableButtons();
+    
+   lcd.clear(); lcd.print("BT Setup");
+   UART_init(38400);
+
+  for (i=0; i<NrAT; i++) {
+//     strcpy_P(LineBuffer, (char*)pgm_read_word(&(ATStrings[8]))); // Necessary casts and dereferencing, just copy. 
+     strcpy_P(LineBuffer, (char*)pgm_read_word(&(ATStrings[i]))); // Necessary casts and dereferencing, just copy. 
+     lcd.clear(); lcd.print(LineBuffer);
+     UART_SendString(LineBuffer);
+//     strcpy_P(LineBuffer, (char*)pgm_read_word(&(ATStrings[8]))); // Necessary casts and dereferencing, just copy. 
+     UART_ReceiveString(LineBuffer);  // data = Serial.read();
+     lcd.setCursor(0,1); lcd.write(LineBuffer);
+     delay(8000);
+  }
+  lcd.clear();        lcd.print("Bluetooth ..");
+  lcd.setCursor(0,1); lcd.print(".. configured");
+  delay(2000);
+   
+   EnableButtons();
+}
+
 void ShowDebug(byte ButtonCode) {
   // used to display certain variables
   byte i;
   DisableButtons();
   lcd.clear(); lcd.print("MA: ");lcd.print(MAInputLevel);
   lcd.setCursor(0,1); lcd.print("EnvSpd: "); lcd.print(EnveloppeSpeed);
-  delay(5000);
+  delay(1000);
   DisableButtons();
+  /*
   lcd.clear(); lcd.print("DAC Test");
   for (i=0; i<64; i++) {
     lcd.setCursor(0,1); lcd.write("   "); lcd.setCursor(0,1); 
@@ -764,9 +806,12 @@ void ShowDebug(byte ButtonCode) {
   //  TestDAC();
     delay(1000);
   }
-
+  */
   EnableButtons();
   delay(1000);
+  
+  // do the bluetooth initialization
+ // BTInit();
 }
 
 
@@ -983,6 +1028,12 @@ void MoreOptionsMenu(byte ButtonCode) {
                   }
                  case 3: { // Set As Favorite
                        SetMoreOptions(3);
+                       CurrentMenuIX = 1; CurrentOptionIX = 0;    // go back to Options Menu
+                       OptionsMenu(0); 
+                       break;
+                  }
+                  case 4: { // Bluetooth configuration
+                       BTInit(2);
                        CurrentMenuIX = 1; CurrentOptionIX = 0;    // go back to Options Menu
                        OptionsMenu(0); 
                        break;
